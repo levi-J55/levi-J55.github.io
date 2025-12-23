@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>💎 Crypto Dashboard 💎</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  margin:0; font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white; display:flex; flex-direction:column; align-items:center;
+  scroll-behavior:smooth;
+}
+h1{
+  margin:30px 0; color: gold; text-align:center; letter-spacing:3px;
+  font-size:3rem; text-shadow: 2px 2px 8px cyan;
+}
+.section{
+  background: rgba(255,255,255,0.05); width:90%; max-width:1000px;
+  margin:30px 0; padding:20px; border-radius:15px; box-shadow: 0 0 20px rgba(0,255,255,0.2);
+  transition: transform 0.5s ease;
+}
+.section:hover{ transform: translateY(-5px);}
+button,a.tip-link{
+  padding:8px 16px; font-weight:bold; border:none; border-radius:10px;
+  cursor:pointer; background:gold; color:black; margin:5px 0; text-decoration:none;
+}
+button:hover,a.tip-link:hover{ background:#ffea00; transform:scale(1.05); }
+
+/* Candles */
+.candles{ display:flex; gap:20px; justify-content:flex-start; flex-wrap:nowrap; height:220px; overflow-x:auto; padding-bottom:20px;}
+.candle{ position:relative; width:40px; height:100%; flex:0 0 auto; cursor:pointer;}
+.wick{ position:absolute; width:4px; left:50%; transform:translateX(-50%);
+  background:white; border-radius:2px; transition:all 1s ease; z-index:2;
+}
+.body{ position:absolute; width:100%; border-radius:4px; transition:all 1s ease; z-index:3;}
+.candle-label{ position:absolute; bottom:-60px; width:100%; text-align:center; font-size:0.7rem; line-height:1rem; pointer-events:none;}
+.candle:hover .body{ box-shadow:0 0 15px yellow; transform:scale(1.1); }
+
+/* Tooltip */
+.tooltip{ position:relative; border-bottom:1px dashed white; cursor:pointer;}
+.tooltip .tooltiptext{
+  visibility:hidden; width:280px; background:rgba(0,0,0,0.9); color:#fff; text-align:left; border-radius:6px; padding:10px;
+  position:absolute; z-index:10; bottom:125%; left:50%; transform:translateX(-50%); opacity:0; transition:opacity 0.4s;
+}
+.tooltip:hover .tooltiptext{ visibility:visible; opacity:1; }
+
+/* Light/Dark toggle */
+#modeToggle{ position:fixed; top:20px; right:20px; padding:10px 15px; border:none; border-radius:10px; cursor:pointer; background:gold; color:black; font-weight:bold;}
+#modeToggle:hover{ background:#ffea00; }
+
+/* X icon link */
+#xLink{ position:fixed; top:20px; left:20px; font-size:2rem; color:cyan; text-decoration:none;}
+#xLink:hover{ transform:scale(1.2); }
+
+/* Confetti */
+.confetti{
+  position:absolute; width:10px; height:10px; border-radius:50%; opacity:0.8;
+  animation:fall 2s linear forwards;
+}
+@keyframes fall{
+  0%{transform:translateY(0) rotate(0deg);}
+  100%{transform:translateY(200px) rotate(360deg); opacity:0;}
+}
+
+/* Quiz stars */
+.star{color:gold; font-size:1.2rem; margin-right:5px;}
+</style>
+</head>
+<body>
+
+<a href="https://x.com/JoshOLevi" target="_blank" id="xLink">🅧</a>
+<button id="modeToggle" onclick="toggleMode()">Toggle Dark/Light Mode</button>
+<h1>💎 Cryptocurrency Dashboard 💎</h1>
+
+<!-- Candlesticks -->
+<div class="section">
+<h2>Animated Candlestick Charts</h2>
+<div class="candles" id="candles"></div>
+</div>
+
+<!-- Terminology -->
+<div class="section">
+<h2>Crypto Terminology (Explicit Definitions)</h2>
+<ul>
+<li><span class="tooltip">Wallet<span class="tooltiptext">A software or hardware solution for securely storing cryptocurrency. Hot wallets are online, cold wallets offline.</span></span></li>
+<li><span class="tooltip">Private Key<span class="tooltiptext">Secret alphanumeric code giving access to your crypto. Never share.</span></span></li>
+<li><span class="tooltip">Public Address<span class="tooltiptext">String for receiving crypto, safe to share. Functions like a bank account number.</span></span></li>
+<li><span class="tooltip">Exchange<span class="tooltiptext">Platform to buy/sell/trade crypto. Examples: Binance, Coinbase.</span></span></li>
+<li><span class="tooltip">Market Cap<span class="tooltiptext">Total crypto value: price × circulating supply.</span></span></li>
+<li><span class="tooltip">FOMO<span class="tooltiptext">Fear of Missing Out — hype-driven buying without analysis.</span></span></li>
+<li><span class="tooltip">FUD<span class="tooltiptext">Fear, Uncertainty, Doubt — negative news or sentiment affecting prices.</span></span></li>
+<li><span class="tooltip">Liquidity<span class="tooltiptext">How easily an asset can be sold without affecting price.</span></span></li>
+<li><span class="tooltip">Volume<span class="tooltiptext">Number of coins traded in a period, indicating activity.</span></span></li>
+<li><span class="tooltip">Order Book<span class="tooltiptext">List of buy/sell orders on an exchange, showing market depth.</span></span></li>
+</ul>
+</div>
+
+<!-- Tips & Trusted Apps -->
+<div class="section">
+<h2>Trading Tips & Trusted Apps</h2>
+<button onclick="showTip()">Show Random Tip</button>
+<p id="tip"></p>
+<p>💡 <a href="https://www.coinmarketcap.com" target="_blank" class="tip-link">CoinMarketCap</a></p>
+<p>💡 <a href="https://academy.binance.com" target="_blank" class="tip-link">Binance Academy</a></p>
+<p>💡 <a href="https://www.coingecko.com" target="_blank" class="tip-link">CoinGecko</a></p>
+</div>
+
+<!-- Fake Trading Simulator -->
+<div class="section">
+<h2>Fake Trading Simulator</h2>
+<input type="number" id="amount" placeholder="Amount in USD">
+<select id="coin">
+  <option value="BTC">BTC</option>
+  <option value="ETH">ETH</option>
+</select>
+<button onclick="simulateTrade()">Buy</button>
+<div id="trade-log"></div>
+</div>
+
+<!-- Quiz -->
+<div class="section">
+<h2>Crypto Quiz</h2>
+<div id="quiz-container">
+<p id="question"></p>
+<div id="quiz-buttons"></div>
+<p id="result"></p>
+<p id="stars"></p>
+</div>
+</div>
+
+<!-- Extra Sections -->
+<div class="section">
+<h2>Crypto Ideas 💡</h2>
+<p>Explore DeFi, staking, yield farming, NFTs, and governance tokens. Understanding these increases strategy and portfolio diversification.</p>
+</div>
+
+<div class="section">
+<h2>Advanced Concepts 📊</h2>
+<p>Candlestick patterns, moving averages, RSI, MACD, and market psychology. These help you read market trends effectively.</p>
+</div>
+
+<div class="section">
+<h2>Market Analysis 📈</h2>
+<p>Trend analysis, volume spikes, news impact, coin correlations, and risk management. Combining these factors improves trading awareness.</p>
+</div>
+
+<script>
+// Light/Dark Mode
+let darkMode=true;
+function toggleMode(){
+  if(darkMode){ document.body.style.background="#f0f0f0"; document.body.style.color="#000"; darkMode=false; }
+  else{ document.body.style.background="linear-gradient(135deg,#0f2027,#203a43,#2c5364)"; document.body.style.color="#fff"; darkMode=true; }
+}
+
+// Candlestick Data
+let candlesData = [];
+for(let i=0;i<35;i++){
+  const open = 20000 + Math.random()*4000 - 2000;
+  const close = 20000 + Math.random()*4000 - 2000;
+  const high = Math.max(open, close) + Math.random()*500;
+  const low = Math.min(open, close) - Math.random()*500;
+  const color = close>=open ? "green" : "red";
+  candlesData.push({open,close,high,low,color});
+}
+
+const container = document.getElementById("candles");
+const chartHeight = 160;
+const minPrice = Math.min(...candlesData.map(c=>c.low))-200;
+const maxPrice = Math.max(...candlesData.map(c=>c.high))+200;
+function priceToY(price){ return chartHeight - ((price - minPrice)/(maxPrice - minPrice))*chartHeight; }
+
+function formatNumber(num){ 
+  if(num >= 1000) return (num/1000).toFixed(2)+"k";
+  return num.toFixed(2);
+}
+
+// Create Candles
+function createCandles(){
+  container.innerHTML="";
+  candlesData.forEach(()=>{
+    const cDiv=document.createElement("div"); cDiv.classList.add("candle");
+    const wick=document.createElement("div"); wick.className="wick"; cDiv.appendChild(wick);
+    const body=document.createElement("div"); body.className="body"; cDiv.appendChild(body);
+    const label=document.createElement("div"); label.className="candle-label"; cDiv.appendChild(label);
+    container.appendChild(cDiv);
+  });
+}
+createCandles();
+
+// Draw Candles
+function drawCandles(){
+  document.querySelectorAll(".candle").forEach((cDiv,i)=>{
+    const c = candlesData[i];
+    const wick = cDiv.querySelector(".wick");
+    const body = cDiv.querySelector(".body");
+    const label = cDiv.querySelector(".candle-label");
+    const top = priceToY(c.high);
+    const bottom = priceToY(c.low);
+    const openY = priceToY(c.open);
+    const closeY = priceToY(c.close);
+    wick.style.top = (top -5)+"px";
+    wick.style.height = Math.max((bottom - top +10), 2)+"px"; // ensure visible
+    const bodyHeight = Math.max(Math.abs(openY - closeY), 2); // minimum height
+    const bodyTop = Math.min(openY, closeY);
+    body.style.top = bodyTop + "px";
+    body.style.height = bodyHeight + "px";
+    body.style.background = c.color==="green"? "#00ff6a":"#ff3b3b";
+    label.innerHTML=`O:${formatNumber(c.open)}<br>C:${formatNumber(c.close)}<br>H:${formatNumber(c.high)}<br>L:${formatNumber(c.low)}`;
+  });
+}
+drawCandles();
+
+// Animate candles
+setInterval(()=>{
+  candlesData.forEach(c=>{
+    const fluct=(Math.random()-0.5)*200;
+    c.high = Math.max(c.close,c.open)+fluct;
+    c.low = Math.min(c.close,c.open)-fluct;
+  });
+  drawCandles();
+},2500);
+
+// Tips
+const tips=["Never share your private key. 🔑","Start with small amounts. 💰","Avoid emotional trading. 😌","Use stop-loss orders. 🚨","Research before investing. 📚"];
+function showTip(){ 
+  const tip = tips[Math.floor(Math.random()*tips.length)];
+  const tipP = document.getElementById("tip");
+  tipP.style.opacity=0;
+  setTimeout(()=>{ tipP.textContent=tip; tipP.style.opacity=1; },200);
+}
+
+// Fake Trade + Confetti
+function simulateTrade(){
+  const coin=document.getElementById("coin").value;
+  const amount=parseFloat(document.getElementById("amount").value);
+  if(isNaN(amount)||amount<=0){ alert("Enter a valid amount"); return; }
+  let change=(Math.random()*0.2-0.1);
+  let result=Math.round((amount*(1+change))*100)/100;
+  const log = document.getElementById("trade-log");
+  log.innerHTML=`Bought ${amount} USD ${coin}. Current simulated value: ${result} USD (${(change*100).toFixed(2)}%)`;
+
+  // Confetti
+  for(let i=0;i<10;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=(Math.random()*window.innerWidth)+"px";
+    c.style.background = ["#ffea00","#00ff6a","#00ffff"][Math.floor(Math.random()*3)];
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),2000);
+  }
+}
+
+// Quiz
+const quiz=[{q:"What does a green candlestick mean?", a:["Close higher than open","Close lower than open"], correct:0},
+{q:"What is FOMO?", a:["Fear of Missing Out","Fear of Money Only"], correct:0},
+{q:"What is a wallet?", a:["A place to store crypto","A bank account"], correct:0}];
+let currentQ=0, score=0;
+function loadQuiz(){
+  const starsP=document.getElementById("stars");
+  if(currentQ>=quiz.length){ 
+    document.getElementById("quiz-container").innerHTML=`<p>Quiz finished! Score: ${score}/${quiz.length}</p>`; 
+    return; 
+  }
+  document.getElementById("question").textContent=quiz[currentQ].q;
+  const btnDiv=document.getElementById("quiz-buttons"); btnDiv.innerHTML="";
+  quiz[currentQ].a.forEach((opt,i)=>{
+    const b=document.createElement("button"); b.textContent=opt;
+    b.onclick=()=>{
+      if(i===quiz[currentQ].correct){
+        score++; document.getElementById("result").textContent="✅ Correct!"; document.getElementById("result").style.color="#00ff6a";
+      }
+      else{document.getElementById("result").textContent="❌ Wrong."; document.getElementById("result").style.color="#ff3b3b";}
+      starsP.innerHTML = "⭐".repeat(score);
+      currentQ++; setTimeout(loadQuiz,1000);
+    };
+    btnDiv.appendChild(b);
+  });
+}
+loadQuiz();
+</script>
+</body>
+  </html>
